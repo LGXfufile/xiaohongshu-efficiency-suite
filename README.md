@@ -1,46 +1,159 @@
-# Getting Started with Create React App
+# 小红书提效管理系统 🌟
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+一个基于AI的小红书运营全链路管理系统，从选题策划到内容发布再到数据分析的完整闭环。
 
-## Available Scripts
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![React](https://img.shields.io/badge/React-18.0+-brightgreen.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-4.0+-blue.svg)
+![Vercel](https://img.shields.io/badge/deploy-Vercel-black.svg)
 
-In the project directory, you can run:
+## ✨ 核心功能
 
-### `npm start`
+### 🤖 AI创作工坊
+- **智能标题生成**: 基于DeepSeek AI生成爆款标题
+- **内容智能创作**: 一键生成符合小红书调性的优质内容
+- **多风格支持**: 热门爆款、专业权威、轻松随意三种风格
+- **关键词优化**: 智能融入关键词提升搜索排名
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### 📊 数据军师
+- **全域数据看板**: 可视化展示曝光、点击、互动、涨粉等核心指标
+- **AI深度复盘**: 自动生成分析报告，科学决策优化方向
+- **趋势分析**: 7日数据趋势，洞察增长规律
+- **内容效果对比**: 不同类型内容表现分析
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### ⚡ 自动化引擎
+- **定时发布**: 支持多条内容批量定时发布
+- **最佳时间推荐**: AI分析最佳发布时间窗口
+- **发布队列管理**: 可视化管理待发布内容
+- **成功率监控**: 实时监控发布成功率
 
-### `npm test`
+### 🧠 AI策略大脑
+- **热门话题挖掘**: 实时抓取全网热点话题
+- **竞品对标分析**: 自动分析竞品表现数据
+- **内容建议**: AI推荐高潜力创作方向
+- **预测分析**: 基于数据预测内容表现
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🎨 设计特色
 
-### `npm run build`
+采用苹果官网极简美学设计语言：
+- **极致留白**: 大量使用留白，避免信息拥挤
+- **聚焦核心**: 界面元素服务于内容本身
+- **高清视觉**: 高质量图标、按钮圆润边缘
+- **流畅动效**: 平滑的淡入淡出和位移动画
+- **色彩克制**: 以白色和浅灰为主，小红书红作点缀
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 技术栈
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **前端框架**: React 18 + TypeScript
+- **UI组件库**: Ant Design (深度定制苹果风格)
+- **状态管理**: Zustand
+- **数据可视化**: ECharts
+- **AI服务**: DeepSeek API
+- **构建工具**: Create React App
+- **部署平台**: Vercel
+- **代码管理**: GitHub
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🔧 本地开发
 
-### `npm run eject`
+### 环境要求
+- Node.js 16.0+
+- npm 或 yarn
+- Git
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### 安装步骤
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. 克隆仓库
+```bash
+git clone https://github.com/LGXfufile/xiaohongshu-efficiency-suite.git
+cd xiaohongshu-efficiency-suite
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+2. 安装依赖
+```bash
+npm install
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+3. 启动开发服务器
+```bash
+npm start
+```
 
-## Learn More
+4. 浏览器访问 `http://localhost:3000`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 可用脚本
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- `npm start` - 启动开发服务器
+- `npm run build` - 构建生产版本
+- `npm test` - 运行测试
+- `npm run eject` - 弹出配置文件（不可逆）
+
+## 🌐 在线体验
+
+访问部署地址: [https://xiaohongshu-efficiency-suite-6wjpj5a6c.vercel.app](https://xiaohongshu-efficiency-suite-6wjpj5a6c.vercel.app)
+
+## 📱 功能截图
+
+### 仪表盘
+现代化的数据看板，一目了然的关键指标展示
+
+### AI创作工坊
+三栏式布局，输入参数 -> 生成内容 -> 结果展示
+
+### 数据军师
+丰富的图表展示，AI生成的深度分析报告
+
+### 自动化引擎
+智能化的发布管理，最佳时间推荐
+
+## 🔒 环境变量
+
+创建 `.env.local` 文件并配置以下变量：
+
+```env
+REACT_APP_DEEPSEEK_API_KEY=your_deepseek_api_key
+```
+
+## 🚀 部署
+
+### Vercel 一键部署
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/LGXfufile/xiaohongshu-efficiency-suite)
+
+### 手动部署
+
+1. 构建项目
+```bash
+npm run build
+```
+
+2. 将 `build` 文件夹部署到任意静态托管服务
+
+## 🤝 贡献指南
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+## 📄 许可证
+
+本项目基于 MIT 许可证开源 - 查看 [LICENSE](LICENSE) 文件了解详情
+
+## 🙏 致谢
+
+- [React](https://reactjs.org/) - 用户界面构建库
+- [Ant Design](https://ant.design/) - 企业级UI组件库
+- [DeepSeek](https://deepseek.com/) - AI内容生成服务
+- [Vercel](https://vercel.com/) - 现代化部署平台
+
+## 📧 联系方式
+
+- GitHub: [@LGXfufile](https://github.com/LGXfufile)
+- 项目链接: [https://github.com/LGXfufile/xiaohongshu-efficiency-suite](https://github.com/LGXfufile/xiaohongshu-efficiency-suite)
+
+---
+
+⭐ 如果这个项目对你有帮助，欢迎 Star 支持！
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
