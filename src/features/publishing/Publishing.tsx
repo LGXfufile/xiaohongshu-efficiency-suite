@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { Row, Col, Card, Button, Table, Switch, DatePicker, TimePicker, Input, Select, message, Tag, Modal } from 'antd';
+import { Row, Col, Card, Button, Table, Switch, DatePicker, TimePicker, Input, Select, message, Tag, Modal, Alert } from 'antd';
 import { 
-  ScheduleOutlined, 
   PlusOutlined, 
   PlayCircleOutlined, 
-  PauseCircleOutlined,
   DeleteOutlined,
-  EditOutlined
+  EditOutlined,
+  WifiOutlined,
+  DisconnectOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useAppStore } from '../../store';
+import { LoginStatus } from '../../services/xiaohongshu/config';
+import XHSAccountManager from '../../components/login/XHSAccountManager';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -24,6 +27,8 @@ interface ScheduledPost {
 }
 
 const Publishing: React.FC = () => {
+  const { loginStatus, currentUser } = useAppStore();
+  
   const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([
     {
       id: '1',
@@ -180,20 +185,49 @@ const Publishing: React.FC = () => {
 
   return (
     <div>
+      {/* 小红书登录状态检查 */}
+      {loginStatus !== LoginStatus.LOGGED_IN && (
+        <Alert
+          message="请先登录小红书账户"
+          description="自动化发布功能需要先登录小红书账户才能使用"
+          type="warning"
+          showIcon
+          icon={<DisconnectOutlined />}
+          style={{ marginBottom: 24 }}
+          action={
+            <Button size="small" type="primary">
+              立即登录
+            </Button>
+          }
+        />
+      )}
+
+      {/* 小红书账户管理 */}
+      <div style={{ marginBottom: 24 }}>
+        <XHSAccountManager />
+      </div>
+
+      {/* 自动化控制面板 */}
       <Row gutter={[24, 24]}>
-        {/* 自动化控制面板 */}
         <Col span={24}>
           <Card className="apple-card">
             <Row align="middle" justify="space-between">
               <Col>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <PlayCircleOutlined style={{ fontSize: 24, color: '#34C759', marginRight: 12 }} />
+                  {loginStatus === LoginStatus.LOGGED_IN ? (
+                    <WifiOutlined style={{ fontSize: 24, color: '#34C759', marginRight: 12 }} />
+                  ) : (
+                    <PlayCircleOutlined style={{ fontSize: 24, color: '#86868B', marginRight: 12 }} />
+                  )}
                   <div>
                     <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#1D1D1F' }}>
                       自动化发布引擎
                     </h3>
                     <p style={{ margin: 0, color: '#86868B', fontSize: 14 }}>
-                      智能管理内容发布时间，优化曝光效果
+                      {loginStatus === LoginStatus.LOGGED_IN 
+                        ? `已连接到 ${currentUser?.nickname || '小红书账户'}，可以开始自动化发布`
+                        : '需要登录小红书账户后才能启用自动化发布'
+                      }
                     </p>
                   </div>
                 </div>
@@ -204,14 +238,16 @@ const Publishing: React.FC = () => {
                     自动发布
                   </span>
                   <Switch 
-                    checked={autoPublish}
+                    checked={autoPublish && loginStatus === LoginStatus.LOGGED_IN}
                     onChange={setAutoPublish}
                     size="default"
+                    disabled={loginStatus !== LoginStatus.LOGGED_IN}
                   />
                   <Button
                     className="apple-button-primary"
                     icon={<PlusOutlined />}
                     onClick={() => setIsModalVisible(true)}
+                    disabled={loginStatus !== LoginStatus.LOGGED_IN}
                   >
                     新增定时任务
                   </Button>
