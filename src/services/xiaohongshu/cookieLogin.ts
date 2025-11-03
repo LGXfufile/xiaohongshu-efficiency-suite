@@ -8,6 +8,7 @@ import {
   AntiDetection, 
   Logger 
 } from './config';
+import { LoginChecker } from './loginChecker';
 import { v4 as uuidv4 } from 'uuid';
 
 export class CookieLoginService {
@@ -119,30 +120,34 @@ export class CookieLoginService {
   // 验证Cookie是否有效
   private async validateCookie(cookieString: string): Promise<boolean> {
     try {
-      // 解析Cookie字符串
-      const cookies = this.parseCookieString(cookieString);
+      // 临时设置Cookie进行验证
+      const originalCookies = document.cookie;
       
-      // 检查关键Cookie是否存在
-      const requiredCookies = ['web_session', 'webId', 'websectiga'];
-      const hasRequiredCookies = requiredCookies.some(name => 
-        cookies.some(cookie => cookie.name === name)
-      );
-
-      if (!hasRequiredCookies) {
-        Logger.warn('缺少必要的Cookie字段');
-        return false;
+      // 解析并设置Cookie
+      const cookies = this.parseCookieString(cookieString);
+      for (const cookie of cookies) {
+        document.cookie = `${cookie.name}=${cookie.value}; domain=.xiaohongshu.com; path=/`;
       }
 
-      // 检查Cookie是否过期
-      const now = new Date();
-      const hasValidCookie = cookies.some(cookie => {
-        if (cookie.expires) {
-          return new Date(cookie.expires) > now;
+      // 使用LoginChecker验证登录状态
+      const result = await LoginChecker.checkLoginStatus();
+      
+      // 恢复原始Cookie
+      // 清除测试Cookie
+      for (const cookie of cookies) {
+        document.cookie = `${cookie.name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.xiaohongshu.com`;
+      }
+      
+      // 恢复原始Cookie
+      if (originalCookies) {
+        const originalCookieList = originalCookies.split(';');
+        for (const cookie of originalCookieList) {
+          document.cookie = cookie.trim();
         }
-        return true; // Session cookies are considered valid
-      });
+      }
 
-      return hasValidCookie;
+      Logger.info('Cookie验证结果', { isValid: result.isLoggedIn });
+      return result.isLoggedIn;
 
     } catch (error) {
       Logger.error('Cookie验证失败', error);
@@ -191,101 +196,14 @@ export class CookieLoginService {
   // 检查当前登录状态
   private async checkLoginStatus(): Promise<{ isLoggedIn: boolean; userInfo?: any }> {
     try {
-      // 方法1: 检查页面元素
-      const nameBoxCheck = await this.checkPageElements();
-      if (nameBoxCheck.isLoggedIn) {
-        return nameBoxCheck;
-      }
-
-      // 方法2: API验证
-      const apiCheck = await this.checkLoginAPI();
-      return apiCheck;
-
+      // 使用新的LoginChecker
+      const result = await LoginChecker.checkLoginStatus();
+      return {
+        isLoggedIn: result.isLoggedIn,
+        userInfo: result.userInfo
+      };
     } catch (error) {
       Logger.error('检查登录状态失败', error);
-      return { isLoggedIn: false };
-    }
-  }
-
-  // 通过页面元素检查登录状态
-  private async checkPageElements(): Promise<{ isLoggedIn: boolean; userInfo?: any }> {
-    return new Promise((resolve) => {
-      if (!this.iframe) {
-        resolve({ isLoggedIn: false });
-        return;
-      }
-
-      const checkInterval = setInterval(() => {
-        try {
-          const iframeDoc = this.iframe!.contentDocument || this.iframe!.contentWindow?.document;
-          if (!iframeDoc) return;
-
-          // 检查登录标识元素
-          const nameBox = iframeDoc.querySelector(XHS_CONFIG.SELECTORS.NAME_BOX);
-          const userAvatar = iframeDoc.querySelector(XHS_CONFIG.SELECTORS.USER_AVATAR);
-          
-          if (nameBox || userAvatar) {
-            clearInterval(checkInterval);
-            
-            // 提取用户信息
-            const userInfo = {
-              nickname: nameBox?.textContent?.trim() || '',
-              avatar: userAvatar?.getAttribute('src') || ''
-            };
-
-            Logger.info('通过页面元素检测到登录状态', userInfo);
-            resolve({ isLoggedIn: true, userInfo });
-          }
-        } catch (error) {
-          Logger.error('页面元素检查出错', error);
-        }
-      }, 1000);
-
-      // 30秒超时
-      setTimeout(() => {
-        clearInterval(checkInterval);
-        resolve({ isLoggedIn: false });
-      }, 30000);
-
-      // 导航到小红书页面进行检查
-      if (this.iframe) {
-        this.iframe.src = XHS_CONFIG.CREATOR_BASE;
-      }
-    });
-  }
-
-  // 通过API检查登录状态
-  private async checkLoginAPI(): Promise<{ isLoggedIn: boolean; userInfo?: any }> {
-    try {
-      const response = await fetch(`${XHS_CONFIG.API_BASE}/api/sns/web/v1/user/otherinfo`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'User-Agent': AntiDetection.getRandomUserAgent(),
-          'Referer': XHS_CONFIG.BASE_URL,
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          Logger.info('API验证登录成功', data.data);
-          return { 
-            isLoggedIn: true, 
-            userInfo: {
-              nickname: data.data.nickname || '',
-              avatar: data.data.avatar || '',
-              userId: data.data.userId || ''
-            }
-          };
-        }
-      }
-
-      return { isLoggedIn: false };
-
-    } catch (error) {
-      Logger.error('API检查登录状态失败', error);
       return { isLoggedIn: false };
     }
   }

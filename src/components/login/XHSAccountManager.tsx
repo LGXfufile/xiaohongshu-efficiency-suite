@@ -30,6 +30,7 @@ import {
 import { useAppStore } from '../../store';
 import { xhsLoginService } from '../../services/xiaohongshu/loginService';
 import { LoginStatus, LoginMethod, XHSAccount } from '../../services/xiaohongshu/config';
+import { QuickLoginChecker } from '../../services/xiaohongshu/quickLoginChecker';
 
 const XHSAccountManager: React.FC = () => {
   const { 
@@ -63,11 +64,30 @@ const XHSAccountManager: React.FC = () => {
 
     xhsLoginService.onStatusChange(handleStatusChange);
 
-    // 初始化数据
-    const accounts = xhsLoginService.getAllAccounts();
-    setAllAccounts(accounts);
-    setLoginStatus(xhsLoginService.getCurrentStatus());
-    setCurrentUser(xhsLoginService.getCurrentUser());
+    // 初始化数据和快速检查
+    const initializeData = async () => {
+      const accounts = xhsLoginService.getAllAccounts();
+      setAllAccounts(accounts);
+      
+      // 快速检查当前登录状态
+      try {
+        const quickResult = await QuickLoginChecker.quickCheck();
+        if (quickResult.isLoggedIn) {
+          setLoginStatus(LoginStatus.LOGGED_IN);
+          const activeAccount = xhsLoginService.getCurrentUser();
+          setCurrentUser(activeAccount);
+        } else {
+          setLoginStatus(LoginStatus.NOT_LOGGED_IN);
+          setCurrentUser(null);
+        }
+      } catch (error) {
+        console.error('快速登录检查失败:', error);
+        setLoginStatus(xhsLoginService.getCurrentStatus());
+        setCurrentUser(xhsLoginService.getCurrentUser());
+      }
+    };
+
+    initializeData();
 
     return () => {
       xhsLoginService.removeStatusListener(handleStatusChange);

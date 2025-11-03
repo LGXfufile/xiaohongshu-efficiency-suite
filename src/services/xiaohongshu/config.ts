@@ -8,16 +8,24 @@ export const XHS_CONFIG = {
   API_BASE: 'https://edith.xiaohongshu.com',
   CREATOR_BASE: 'https://creator.xiaohongshu.com',
   
-  // 页面选择器
+  // 页面选择器 - 使用更通用的选择器
   SELECTORS: {
-    USERNAME_INPUT: '.css-1hguu2q',
-    CODE_INPUT: '.css-1hguu2q',
-    LOGIN_BUTTON: '.css-button',
-    SEND_CODE_BUTTON: '.send-code-btn',
-    NAME_BOX: '.name-box',
-    USER_AVATAR: '.user-avatar',
-    PROFILE_MENU: '.profile-menu'
+    USERNAME_INPUT: 'input[placeholder*="手机号"], input[type="tel"], input[name="phone"], .phone-input',
+    CODE_INPUT: 'input[placeholder*="验证码"], input[name="verifyCode"], .verify-code-input',
+    LOGIN_BUTTON: 'button[type="submit"], .login-btn, .submit-btn, button:contains("登录")',
+    SEND_CODE_BUTTON: '.send-code-btn, button:contains("发送验证码"), .verify-btn',
+    NAME_BOX: '.name-box, .username, .nickname, .user-name',
+    USER_AVATAR: '.user-avatar, .avatar, .user-photo, .profile-avatar',
+    PROFILE_MENU: '.profile-menu, .user-menu, .dropdown-menu',
+    LOGGED_IN_INDICATOR: '.user-info, .profile, .avatar, .user-avatar, [data-testid="user-info"]'
   },
+  
+  // 验证登录状态的URL
+  CHECK_LOGIN_URLS: [
+    'https://creator.xiaohongshu.com/api/sns/web/v1/user/me',
+    'https://www.xiaohongshu.com/api/sns/web/v1/user/me',
+    'https://edith.xiaohongshu.com/api/sns/web/v1/user/me'
+  ],
   
   // 反检测配置
   ANTI_DETECTION: {

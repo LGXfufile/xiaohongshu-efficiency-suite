@@ -10,6 +10,7 @@ import {
 } from './config';
 import { CookieLoginService } from './cookieLogin';
 import { SMSLoginService } from './smsLogin';
+import { LoginChecker } from './loginChecker';
 
 // 登录监控器
 export class LoginMonitor {
@@ -58,23 +59,28 @@ export class LoginMonitor {
 
   // 检查登录状态
   private async checkLoginStatus(): Promise<void> {
-    const activeAccount = CookieManager.getActiveAccount();
-    if (!activeAccount) {
-      this.statusCallback?.(LoginStatus.NOT_LOGGED_IN);
-      return;
+    try {
+      // 使用新的LoginChecker
+      const result = await LoginChecker.checkLoginStatus();
+      
+      if (result.isLoggedIn) {
+        // 构造账户信息
+        const activeAccount = CookieManager.getActiveAccount();
+        if (activeAccount && result.userInfo) {
+          // 更新用户信息
+          activeAccount.nickname = result.userInfo.nickname || activeAccount.nickname;
+          activeAccount.avatar = result.userInfo.avatar || activeAccount.avatar;
+          CookieManager.saveAccount(activeAccount);
+        }
+        
+        this.statusCallback?.(LoginStatus.LOGGED_IN, activeAccount || undefined);
+      } else {
+        this.statusCallback?.(LoginStatus.NOT_LOGGED_IN);
+      }
+    } catch (error) {
+      Logger.error('登录状态检查失败', error);
+      this.statusCallback?.(LoginStatus.LOGIN_FAILED);
     }
-
-    // 验证Cookie是否仍然有效
-    const cookieService = new CookieLoginService();
-    const result = await cookieService.loginWithCookie(activeAccount.id);
-
-    if (result.success) {
-      this.statusCallback?.(LoginStatus.LOGGED_IN, result.account);
-    } else {
-      this.statusCallback?.(LoginStatus.SESSION_EXPIRED, activeAccount);
-    }
-
-    cookieService.destroy();
   }
 
   // 销毁监控器
